@@ -2,4 +2,4 @@
 
 First, get the googlevr sdk for Unity: https://github.com/googlevr/gvr-unity-sdk
 
-Then add the Autowalk Script above to your project.
+Then add the Autowalk Script above to your project, follow the directions in the Script's comments.
