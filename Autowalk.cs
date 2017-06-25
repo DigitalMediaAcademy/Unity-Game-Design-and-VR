@@ -1,6 +1,7 @@
-﻿/*
-This script was developed by Jupp Otto. It's free to use and there are no restrictions in modification.
-If there are any questions you can send me an Email: juppotto3@gmail.com
+/*
+This script was originally developed by Jupp Otto, and modified by Shane White with Digital Media Academy. 
+It's free to use and there are no restrictions in modification.
+If there are any questions you can send me an Email: shane@gig.ma
 This script moves your player automatically in the direction he is looking at. You can 
 activate the autowalk function by pull the cardboard trigger, by define a threshold angle 
 or combine both by selecting both of these options.
@@ -10,8 +11,8 @@ when the player is looking 29° down to the bottom. This script can easally be c
 in the Unity Inspector. 
 How to get started with this script?: 
 0. haven't the Google VR SDK yet, follow this guide https://developers.google.com/vr/unity/get-started
-1. Import the exampple package downloaded in step 0 (GoogleVRForUnity.unitypackage).
-2. Load the GVRDemo scene.
+1. Import the exampple package downloaded in step 0.
+2. Load the GVRDemo scene or your own.
 3. Attach a Rigidbody to the "Player" GameObject.
 4. Freeze X, Y and Z Rotation of the Rgidbody in the inspector. 
 5. Attach a Capsule Collider to the "Player" GameObject.
@@ -28,102 +29,104 @@ using System.Collections;
 
 public class Autowalk : MonoBehaviour
 {
-	private const int RIGHT_ANGLE = 90;
+    private const int RIGHT_ANGLE = 90;
 
-	// This variable determinates if the player will move or not 
-	private bool isWalking = false;
+    // This variable determinates if the player will move or not 
+    private bool isWalking = false;
 
-	Transform mainCamera = null;
+    Transform mainCamera = null;
 
-	//This is the variable for the player speed
-	[Tooltip("With this speed the player will move.")]
-	public float speed;
+    //This is the variable for the player speed
+    [Tooltip("With this speed the player will move.")]
+    public float speed;
 
-	[Tooltip("Activate this checkbox if the player shall move when the Cardboard trigger is pulled.")]
-	public bool walkWhenTriggered;
+    [Tooltip("Activate this checkbox if the player shall move when the Cardboard trigger is pulled.")]
+    public bool walkWhenTriggered;
 
-	[Tooltip("Activate this checkbox if the player shall move when he looks below the threshold.")]
-	public bool walkWhenLookDown;
+    [Tooltip("Activate this checkbox if the player shall move when he looks below the threshold.")]
+    public bool walkWhenLookDown;
 
-	[Tooltip("This has to be an angle from 0° to 90°")]
-	public double thresholdAngle;
+    [Tooltip("This has to be an angle from 0° to 90°")]
+    public double thresholdAngle;
 
-	[Tooltip("Activate this Checkbox if you want to freeze the y-coordiante for the player. " +
-		"For example in the case of you have no collider attached to your CardboardMain-GameObject" +
-		"and you want to stay in a fixed level.")]
-	public bool freezeYPosition;
-	public bool triggered = false;
+    [Tooltip("Activate this Checkbox if you want to freeze the y-coordiante for the player. " +
+        "For example in the case of you have no collider attached to your CardboardMain-GameObject" +
+        "and you want to stay in a fixed level.")]
+    public bool freezeYPosition;
+    public bool triggered = false;
 
-	[Tooltip("This is the fixed y-coordinate.")]
-	public float yOffset;
+    [Tooltip("This is the fixed y-coordinate.")]
+    public float yOffset;
 
-	void Start()
-	{
-		mainCamera = Camera.main.transform;
-		yOffset += transform.position.y; 
-	}
+    void Start()
+    {
+        mainCamera = Camera.main.transform;
+        yOffset += transform.position.y;
+    }
 
-	void Update()
-	{
-		// Walk when the Cardboard Trigger is used 
-		if (walkWhenTriggered && !walkWhenLookDown && !isWalking && Input.touches.Length > 0)
-		{
-			isWalking = true;
-		}
-		else if (walkWhenTriggered && !walkWhenLookDown && isWalking && Input.touches.Length <= 0)
-		{
-			isWalking = false;
-		}
+    void Update()
+    {
+        // Walk when the Cardboard Trigger is used 
+        if (walkWhenTriggered && !walkWhenLookDown && !isWalking && Input.touches.Length > 0)
+        {
+            isWalking = true;
+        }
+        else if (walkWhenTriggered && !walkWhenLookDown && isWalking && Input.touches.Length <= 0)
+        {
+            isWalking = false;
+        }
 
-		// Walk when player looks below the threshold angle 
-		if (walkWhenLookDown && !walkWhenTriggered && !isWalking &&
-			mainCamera.transform.eulerAngles.x >= thresholdAngle &&
-			mainCamera.transform.eulerAngles.x <= RIGHT_ANGLE)
-		{
-			isWalking = true;
-		}
-		else if (walkWhenLookDown && !walkWhenTriggered && isWalking &&
-			(mainCamera.transform.eulerAngles.x <= thresholdAngle ||
-				mainCamera.transform.eulerAngles.x >= RIGHT_ANGLE))
-		{
-			isWalking = false;
-		}
+        // Walk when player looks below the threshold angle 
+        if (walkWhenLookDown && !walkWhenTriggered && !isWalking &&
+            mainCamera.transform.eulerAngles.x >= thresholdAngle &&
+            mainCamera.transform.eulerAngles.x <= RIGHT_ANGLE)
+        {
+            isWalking = true;
+        }
+        else if (walkWhenLookDown && !walkWhenTriggered && isWalking &&
+            (mainCamera.transform.eulerAngles.x <= thresholdAngle ||
+                mainCamera.transform.eulerAngles.x >= RIGHT_ANGLE))
+        {
+            isWalking = false;
+        }
 
-		// Walk when the Cardboard trigger is used and the player looks down below the threshold angle
-		if (walkWhenLookDown && walkWhenTriggered && !isWalking &&
-			mainCamera.transform.eulerAngles.x >= thresholdAngle &&
-			Input.touches.Length > 0 &&
-			mainCamera.transform.eulerAngles.x <= RIGHT_ANGLE)
-		{
-			isWalking = true;
-		}
-		else if (walkWhenLookDown && walkWhenTriggered && isWalking &&
-			mainCamera.transform.eulerAngles.x >= thresholdAngle &&
-			(Input.touches.Length > 0 ||
-				mainCamera.transform.eulerAngles.x >= RIGHT_ANGLE))
-		{
-			isWalking = false;
-		}
+        // Walk when the Cardboard trigger is used and the player looks down below the threshold angle
+        if (walkWhenLookDown && walkWhenTriggered && !isWalking &&
+            mainCamera.transform.eulerAngles.x >= thresholdAngle &&
+            Input.touches.Length > 0 &&
+            mainCamera.transform.eulerAngles.x <= RIGHT_ANGLE)
+        {
+            isWalking = true;
+        }
+        else if (walkWhenLookDown && walkWhenTriggered && isWalking &&
+            mainCamera.transform.eulerAngles.x >= thresholdAngle &&
+            (Input.touches.Length > 0 ||
+                mainCamera.transform.eulerAngles.x >= RIGHT_ANGLE))
+        {
+            isWalking = false;
+        }
 
-		if (isWalking)
-		{
-			Vector3 direction = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * speed * Time.deltaTime;
-			Quaternion rotation = Quaternion.Euler(new Vector3(0, -transform.rotation.eulerAngles.y, 0));
-			transform.Translate(rotation * direction);
-		}
+        if (isWalking)
+        {
+            Vector3 direction = new Vector3(mainCamera.transform.forward.x, 0, mainCamera.transform.forward.z).normalized * speed * Time.deltaTime;
+            Quaternion rotation = Quaternion.Euler(new Vector3(0, -transform.rotation.eulerAngles.y, 0));
+            transform.Translate(rotation * direction);
+        }
 
-		if (freezeYPosition)
-		{
-			transform.position = new Vector3(transform.position.x, yOffset, transform.position.z);
-		}
-	}
+        if (freezeYPosition)
+        {
+            transform.position = new Vector3(transform.position.x, yOffset, transform.position.z);
+        }
+    }
 
-	public void TriggerOn(){
-		triggered = !triggered;
-		Debug.Log ("Triggered!");
-	}
+    public void TriggerOn()
+    {
+        triggered = !triggered;
+        Debug.Log("Triggered!");
+    }
 
-	public void TriggerOff(){
-		triggered = false;
-	}
+    public void TriggerOff()
+    {
+        triggered = false;
+    }
 }
